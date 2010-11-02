@@ -1,9 +1,9 @@
-#include <SDLframework.h>
-#include <iostream>
+#include <SdlFramework/SDLframework.h>
+//#include <iostream>										//uncomment if errors should be automatically printed into stdout
 
 //enviroment variables
-SDLFramework *_framework;									//internal, for error handling
-bool SDLFramework::frCreated = false;
+SDLFramework* SDLFramework::_framework = NULL;				//internal, for error handling
+bool SDLFramework::frCreated = false;						//singleton
 
 void SDLFramework::RunLoop(){
 	Uint32 now=SDL_GetTicks(), interval=100;
@@ -16,7 +16,7 @@ while (1){
 	fatalError = false;
 	while(!errors.empty()){
 		if(errors.top().type == 2) fatalError=true;
-		std::cout<< errors.top().str << '\n';
+		//std::cout<< errors.top().str << '\n';				//disable when you will handle errors manually
 		errors.pop();
 	}
 	if(fatalError) return;	//exit on fatal error
@@ -59,29 +59,38 @@ while (1){
 }
 
 bool SetError(const char *str, int type){				// *3b)
-	if(!_framework) return false;
+	if(!SDLFramework::_framework) return false;
 
 	_FrError dummy;
-	_framework->errors.push(dummy);
+	SDLFramework::_framework->errors.push(dummy);
 	switch(type){
-		case 0: _framework->errors.top().str = "Warning: "; break;
-		case 1: _framework->errors.top().str = "Error: "; break;
-		case 2: _framework->errors.top().str = "Fatal error: "; break;
+		case 0: SDLFramework::_framework->errors.top().str = "Warning: "; break;
+		case 1: SDLFramework::_framework->errors.top().str = "Error: "; break;
+		case 2: SDLFramework::_framework->errors.top().str = "Fatal error: "; break;
 	}
-	_framework->errors.top().str += str;
-	_framework->errors.top().type = type;
+	SDLFramework::_framework->errors.top().str += str;
+	SDLFramework::_framework->errors.top().type = type;
 	return true;
 }
 
 int GetLastError(char *out, int size){
-	if(!_framework) return -1;
+	if(!SDLFramework::_framework) return -1;
 
 	for(int i=0; i<size-1; i++){
-		out[i]= _framework->errors.top().str.c_str()[i];
-		if(!_framework->errors.top().str[i]) break;		//end of str
+		out[i]= SDLFramework::_framework->errors.top().str.c_str()[i];
+		if(!SDLFramework::_framework->errors.top().str[i]) break;		//end of str
 	}
 	out[size-1]=NULL;
-	return _framework->errors.top().type;
+	return SDLFramework::_framework->errors.top().type;
+}
+
+int PopLastError(int *type, char *out, int size){
+	if(!SDLFramework::_framework) return -1;
+	if(SDLFramework::_framework->errors.empty()) return -1;
+
+	*type = GetLastError(out,size);
+	SDLFramework::_framework->errors.pop();
+	return SDLFramework::_framework->errors.size();
 }
 
 int SDLFramework::Init(						

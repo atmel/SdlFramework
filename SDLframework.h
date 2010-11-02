@@ -3,7 +3,7 @@
 /*
 Contains simple SDL framework meant for OpenGL development.
 
-NOTE: YOU MUST ADD MODULES/cpp/SDLframework.cpp TO YOUR SOURCE FILES!
+NOTE: YOU MUST ADD find-where-it-is-located/SDLframework.cpp TO YOUR SOURCE FILES!
 */
 #include <SDL.h>
 #include <stack>
@@ -37,6 +37,7 @@ public:
 
 class SDLFramework {					// *0)
 	static bool frCreated;
+	static SDLFramework *_framework;	
 	SDL_Surface *window;
 	unsigned int width, height;
 	SDLFrInterface *interface;
@@ -61,6 +62,7 @@ public:
 
 	friend bool SetError(const	char *str, int type);		// *3)
 	friend int GetLastError(char *out, int size);			// *3a)
+	friend int PopLastError(int *type, char *out, int size);// returns unprocessed error count
 };
 
 class SDLFrInterface{										//user's interface may or may not support some of these functions
