@@ -93,6 +93,23 @@ int PopLastError(int *type, char *out, int size){
 	return SDLFramework::_framework->errors.size();
 }
 
+SDLFramework* SDLFramework::Create(){
+	if(frCreated) return NULL;
+
+	return new SDLFramework();
+}
+
+SDLFramework::SDLFramework(){				//create singleton and initialize it's pattern
+	frCreated = true;
+	_framework = this;						//for error handling
+}
+
+SDLFramework::~SDLFramework(){
+	frCreated = false;
+	_framework = NULL;
+	SDL_Quit();
+}
+
 int SDLFramework::Init(						
 		SDLFrInterface *inter,				//pointer to user-defined interface
 		int _width,							//in pixels
@@ -105,9 +122,6 @@ int SDLFramework::Init(
 		const char* minTitle				//title of the window if minimized
 						   )				//all passed arguments should be valid and verified before Init is called
 {
-	if(frCreated) return -1;							//Do not create another instance - it is singleton
-	
-	_framework = this;									//for error calls, stays set even if Init fails
 	
 	std::string err;
 	if(SDL_Init(initSystems) == -1){					//initialize SDL
@@ -257,6 +271,5 @@ int SDLFramework::Init(
 }
 	
 	interface = inter;									//set interface pointer
-	frCreated = true;									//initialization successful - First instance created
 	return 1;
 }

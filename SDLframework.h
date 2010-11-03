@@ -43,9 +43,11 @@ class SDLFramework {					// *0)
 	SDLFrInterface *interface;
 	std::stack<_FrError> errors;
 
+	SDLFramework();
+
 public:
-	SDLFramework(){}
-	~SDLFramework(){SDL_Quit();}
+	static SDLFramework* Create();						//factory method, maintains singleton design pattern (NULL if already created)
+	~SDLFramework();
 
 	int Init(											//initialize whole framework, fail if the second framework instance calls Init						
 		SDLFrInterface *inter,								//pointer to user-defined interface
