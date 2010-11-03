@@ -17,9 +17,9 @@ while (1){
 	while(!errors.empty()){
 		if(errors.top().type == 2) fatalError=true;
 		//std::cout<< errors.top().str << '\n';				//disable when you will handle errors manually
-		errors.pop();
+		errors.pop();										//flush errors
 	}
-	if(fatalError) return;	//exit on fatal error
+	if(fatalError) return;									//exit on fatal error
 
 	//Call time function
 	timeLeft = interval-(SDL_GetTicks()-now);				//this 'now' is in fact 'last'
